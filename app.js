@@ -19,12 +19,24 @@ function loadMainMenu() {
       message: "What would you like to do??",
       choices: [
         {
+          name: "Exit",
+          value: "EXIT",
+        },
+        {
           name: "View all employees",
           value: "VIEW_EMPLOYEES",
         },
         {
           name: "View all deparments",
           value: "VIEW_DEPARTMENT"
+        },
+        {
+          name: "View all roles",
+          value: "VIEW_ROLES"
+        },
+        {
+          name: "Add a department",
+          value: "ADD_DEPARTMENT"
         }
       ]
     }
@@ -37,18 +49,26 @@ function loadMainMenu() {
 
 function handleChoices(answer) {
   switch (answer.choice) {
+
+
     case "VIEW_EMPLOYEES":
       return viewEmployees();
   
     case "VIEW_DEPARTMENT":
       return viewDepartments();
+
+    case "VIEW_ROLES":
+      return viewRoles();
+
+    case "ADD_DEPARTMENT":
+      return addDepartment();
   
 
   }
 }
 
 async function viewEmployees() {
-  const employees = await db.findAllEmployees();
+  const employees = await db.allEmployees();
   console.log("\n");
   console.table(employees);
   loadMainMenu();
@@ -56,9 +76,36 @@ async function viewEmployees() {
 }
 
 async function viewDepartments() {
-  const departments = await db.viewAllDepartments();
+  const departments = await db.allDepartments();
   console.log("\n");
   console.table(departments);
   loadMainMenu();
-  
 }
+
+async function viewRoles() {
+  const departments = await db.allRoles();
+  console.log("\n");
+  console.table(departments);
+  loadMainMenu();
+}
+
+async function addDepartment(){
+  
+  inquirer.prompt ([
+    {
+      type: "input",
+      name: "addDepartment",
+      message: "What's the name of the new department",
+    }
+    //Async runs the functions orderly.
+  ]).then(async function (answer) {
+    const addDep = await db.createDepartment(answer.addDepartment);
+    
+  console.log("\n");
+  console.table(addDep);
+  loadMainMenu();
+
+});
+}
+
+
