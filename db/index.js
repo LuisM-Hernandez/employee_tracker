@@ -28,5 +28,9 @@ class DB {
     return this.connection.query("INSERT INTO role (title, salary, department_id) VALUES (?,?,?)", [title,salary,department_id],)
   }
 
+  createEmployee(first_name, last_name, role_id, manager_id){
+    return this.connection.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)", [first_name, last_name, role_id, manager_id],)
+  }
+
 }
   module.exports = new DB(connection);

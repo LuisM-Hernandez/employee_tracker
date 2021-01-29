@@ -78,7 +78,7 @@ function handleChoices(answer) {
       return addRole();
 
     case "ADD_EMPLOYEE":
-      return addRole();
+      return addEmployee();
   }
 }
 
@@ -151,23 +151,36 @@ async function addRole() {
   });
 }
 
-async function add() {
+//Employee
+async function addEmployee() {
 
   inquirer.prompt([
     {
       type: "input",
-      name: "addDepartment",
-      message: "What's the name of the new department",
+      name: "firstName",
+      message: "What is the new employee's first name",
+    },
+    {
+      type: "input",
+      name: "secondName",
+      message: "How much is the second name? ",
+    },
+    {
+      type: "input",
+      name: "roleId",
+      message: "What role id number for the employee? ",
+    },
+    {
+      type: "input",
+      name: "managerId",
+      message: "What is the manager's id number? ",
     }
     //Async runs the functions orderly.
   ]).then(async function (answer) {
-    const addDep = await db.createEmployee(answer.addDepartment);
-
+    const addEmployee = await db.createEmployee(answer.firstName, answer.secondName, answer.roleId, answer.managerId);
     console.log("\n");
-    console.table(addDep);
+    console.table(addEmployee);
     loadMainMenu();
 
   });
 }
-
-
