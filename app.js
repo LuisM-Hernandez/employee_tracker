@@ -37,23 +37,34 @@ function loadMainMenu() {
         {
           name: "Add a department",
           value: "ADD_DEPARTMENT"
+        },
+        {
+          name: "Add a new role",
+          value: "ADD_ROLE"
+        },
+        {
+          name: "Add a new employee",
+          value: "ADD_EMPLOYEE"
         }
       ]
     }
 
-  ]).then(function (answer) {
-    // console.log(answer);
-    handleChoices(answer);
-  })
+  ])
+    .then(function (answer) {
+      // console.log(answer);
+      handleChoices(answer);
+    })
 }
 
 function handleChoices(answer) {
   switch (answer.choice) {
 
+    case "EXIT":
+      return connection.end()
 
     case "VIEW_EMPLOYEES":
       return viewEmployees();
-  
+
     case "VIEW_DEPARTMENT":
       return viewDepartments();
 
@@ -62,8 +73,12 @@ function handleChoices(answer) {
 
     case "ADD_DEPARTMENT":
       return addDepartment();
-  
 
+    case "ADD_ROLE":
+      return addRole();
+
+    case "ADD_EMPLOYEE":
+      return addRole();
   }
 }
 
@@ -89,9 +104,56 @@ async function viewRoles() {
   loadMainMenu();
 }
 
-async function addDepartment(){
-  
-  inquirer.prompt ([
+async function addDepartment() {
+
+  inquirer.prompt([
+    {
+      type: "input",
+      name: "newDepartment",
+      message: "What's the name of the new department",
+    }
+    //Async runs the functions orderly.
+  ]).then(async function (answer) {
+    const addDep = await db.createDepartment(answer.newDepartment);
+
+    console.log("\n");
+    console.table(addDep);
+    loadMainMenu();
+
+  });
+}
+
+async function addRole() {
+
+  inquirer.prompt([
+    {
+      type: "input",
+      name: "roleTitle",
+      message: "What is the new role title?",
+    },
+    {
+      type: "input",
+      name: "addSalary",
+      message: "How much is the salary? ",
+    },
+    {
+      type: "input",
+      name: "roleDep",
+      message: "What is the number of the department? ",
+    }
+    //Async runs the functions orderly.
+  ]).then(async function (answer) {
+    const addRole = await db.createRole(answer.roleTitle, answer.addSalary, answer.roleDep);
+    console.log("\n");
+    console.table(addRole);
+    loadMainMenu();
+
+  });
+}
+
+async function add() {
+
+  inquirer.prompt([
     {
       type: "input",
       name: "addDepartment",
@@ -99,13 +161,13 @@ async function addDepartment(){
     }
     //Async runs the functions orderly.
   ]).then(async function (answer) {
-    const addDep = await db.createDepartment(answer.addDepartment);
-    
-  console.log("\n");
-  console.table(addDep);
-  loadMainMenu();
+    const addDep = await db.createEmployee(answer.addDepartment);
 
-});
+    console.log("\n");
+    console.table(addDep);
+    loadMainMenu();
+
+  });
 }
 
 
