@@ -2,15 +2,18 @@ const inquirer = require("inquirer");
 const logo = require("asciiart-logo");
 const db = require("./db");
 const connection = require("./db/connection");
+const { allEmployees } = require("./db");
 // require("console.table");
 
 init();
+//Function to start the program
 function init() {
   const logoText = logo({ name: "Professional Employee Manager" }).render();
   console.log(logoText);
   loadMainMenu();
 }
 
+//This function prompt all the choices to the user
 function loadMainMenu() {
   inquirer.prompt([
     {
@@ -45,6 +48,10 @@ function loadMainMenu() {
         {
           name: "Add a new employee",
           value: "ADD_EMPLOYEE"
+        },
+        {
+          name: "Update an employee's role",
+          value: "UPDATE_EMPLOYEE"
         }
       ]
     }
@@ -56,6 +63,7 @@ function loadMainMenu() {
     })
 }
 
+//This function execute a switch and case that will run the user selected choice
 function handleChoices(answer) {
   switch (answer.choice) {
 
@@ -79,9 +87,13 @@ function handleChoices(answer) {
 
     case "ADD_EMPLOYEE":
       return addEmployee();
-  }
+
+      case "UPDATE_EMPLOYEE":
+        return updateEmployeeRoles();
+    }
 }
 
+//Display all the employees
 async function viewEmployees() {
   const employees = await db.allEmployees();
   console.log("\n");
@@ -90,6 +102,7 @@ async function viewEmployees() {
 
 }
 
+//Display all the departments
 async function viewDepartments() {
   const departments = await db.allDepartments();
   console.log("\n");
@@ -97,6 +110,7 @@ async function viewDepartments() {
   loadMainMenu();
 }
 
+//Display all the job roles
 async function viewRoles() {
   const departments = await db.allRoles();
   console.log("\n");
@@ -104,6 +118,7 @@ async function viewRoles() {
   loadMainMenu();
 }
 
+//Add a department
 async function addDepartment() {
 
   inquirer.prompt([
@@ -123,6 +138,7 @@ async function addDepartment() {
   });
 }
 
+//Add more roles
 async function addRole() {
 
   inquirer.prompt([
@@ -151,7 +167,7 @@ async function addRole() {
   });
 }
 
-//Employee
+//Add employees
 async function addEmployee() {
 
   inquirer.prompt([
@@ -180,6 +196,68 @@ async function addEmployee() {
     const addEmployee = await db.createEmployee(answer.firstName, answer.secondName, answer.roleId, answer.managerId);
     console.log("\n");
     console.table(addEmployee);
+    loadMainMenu();
+
+  });
+}
+
+//Update employee
+
+async function updateEmployeeRoles() {
+
+  //I need to ask the user what employee it wants to update
+
+  const employeeArr = await db.allEmployees();
+  //Calling the view all roles function
+  const roleArr = await db.allRoles();
+
+  inquirer
+  .prompt([
+    {
+      //Prompt the user the employee list to choose
+      name: "employee",
+      type: "rawlist",
+      choices: function() {
+        var employeeList = [];
+        for (var i = 0; i < employeeArr.length; i++) {
+          employeeList.push(employeeArr[i].first_name + " " + employeeArr[i].last_name);
+        }
+        return employeeList;
+      },
+      message: "Which employee would you need?"
+    },
+    {
+      //Need to populate the role list so the user can choose and then make it change to that role
+      name: "role",
+      type: "rawlist",
+      choices: function() {
+        var roleList = [];
+        for (var i = 0; i < roleArr.length; i++) {
+          roleList.push(roleArr[i].title);
+        }
+        return roleList;
+      },
+      message: "Which role would you like to assign?"
+    }
+    //Async runs the functions orderly.
+  ]).then(async function (answer) {
+
+    var newRole;
+    for (var i = 0; i < roleArr.length; i++) {
+      if (roleArr[i].title === answer.role) {
+        newRole = roleArr[i].id;
+      }
+    }
+
+    var chosenEmployee;
+    for (var i = 0; i < employeeArr.length; i++) {
+      if (employeeArr[i].first_name + " " + employeeArr[i].last_name === answer.employee) {
+        chosenEmployee = employeeArr[i].id;
+      }
+    }
+    const addRole = await db.editEmployeeRoles(chosenEmployee, newRole);
+    console.log("\n");
+    console.table(addRole);
     loadMainMenu();
 
   });

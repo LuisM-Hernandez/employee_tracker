@@ -32,5 +32,9 @@ class DB {
     return this.connection.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)", [first_name, last_name, role_id, manager_id],)
   }
 
+  editEmployeeRoles(employee_name, new_role){
+    return this.connection.query("UPDATE employee SET role_id = ? WHERE id = ?", [new_role, employee_name])
+  }
+
 }
   module.exports = new DB(connection);
